@@ -1,21 +1,19 @@
 version: '3.8'
 
+# Standalone Docker Compose for Open Horizon AI
+# Users can run: curl -O https://raw.githubusercontent.com/odin2-hash/open-horizon-ai/main/docker-compose.standalone.yml && docker-compose -f docker-compose.standalone.yml up -d
+
 services:
   # React Frontend
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: ghcr.io/odin2-hash/open-horizon-ai-frontend:latest
     ports:
-      - "3030:3030"  # Changed from 3000 to avoid conflicts
+      - "3030:3030"
     environment:
       - REACT_APP_API_URL=http://localhost:8090
       - REACT_APP_SUPABASE_URL=${SUPABASE_URL:-https://demo.supabase.co}
       - REACT_APP_SUPABASE_KEY=${SUPABASE_KEY:-demo-key}
       - PORT=3030
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     restart: unless-stopped
     networks:
       - open-horizon-network
@@ -24,16 +22,14 @@ services:
 
   # FastAPI Backend  
   backend:
-    build: 
-      context: .
-      dockerfile: Dockerfile.backend
+    image: ghcr.io/odin2-hash/open-horizon-ai-backend:latest
     ports:
-      - "8090:8090"  # Changed from 8000 to avoid conflicts
+      - "8090:8090"
     environment:
-      - LLM_PROVIDER=openai
+      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
       - LLM_API_KEY=${LLM_API_KEY}
-      - LLM_MODEL=gpt-4o-mini
-      - LLM_BASE_URL=https://api.openai.com/v1
+      - LLM_MODEL=${LLM_MODEL:-gpt-4o-mini}
+      - LLM_BASE_URL=${LLM_BASE_URL:-https://api.openai.com/v1}
       - SUPABASE_URL=${SUPABASE_URL:-https://demo.supabase.co}
       - SUPABASE_KEY=${SUPABASE_KEY:-demo-key}
       - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY:-demo-service-key}
@@ -50,11 +46,9 @@ services:
       - DATABASE_MAX_CONNECTIONS=20
       - ALLOWED_ORIGINS=http://localhost:3030,http://localhost:5173,http://localhost:8090
       - CORS_ALLOW_CREDENTIALS=true
-    env_file:
-      - .env
     restart: unless-stopped
     volumes:
-      - ./logs:/app/logs
+      - logs_data:/app/logs
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8090/api/health"]
       interval: 30s
@@ -64,7 +58,7 @@ services:
     networks:
       - open-horizon-network
 
-  # Optional: Add nginx reverse proxy
+  # Optional: Add nginx reverse proxy (use --profile with-nginx)
   nginx:
     image: nginx:alpine
     ports:
@@ -72,14 +66,15 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - open-horizon-ai
+      - backend
+      - frontend
     restart: unless-stopped
     networks:
       - open-horizon-network
     profiles:
       - with-nginx
 
-  # Optional: Add PostgreSQL database (if not using Supabase)
+  # Optional: Add PostgreSQL database (use --profile with-postgres)
   postgres:
     image: postgres:15-alpine
     environment:
@@ -88,7 +83,6 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     restart: unless-stopped
@@ -99,6 +93,7 @@ services:
 
 volumes:
   postgres_data:
+  logs_data:
 
 networks:
   open-horizon-network:
