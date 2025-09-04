@@ -47,16 +47,45 @@ An intelligent Erasmus+ project management system for Swedish NGO "Open Horizon"
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Option 1: Docker (No Repository Clone Needed) 🐳
+
+Deploy instantly without cloning the repository:
+
+```bash
+# Download standalone docker-compose
+curl -O https://raw.githubusercontent.com/odin2-hash/open-horizon-ai/main/docker-compose.standalone.yml
+
+# Download environment template
+curl -O https://raw.githubusercontent.com/odin2-hash/open-horizon-ai/main/.env.example
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your API keys (see Environment Variables section)
+
+# Start application
+docker-compose -f docker-compose.standalone.yml up -d
+```
+
+**Access:**
+- **Web Interface**: http://localhost:3030
+- **API Documentation**: http://localhost:8090/docs
+- **Health Check**: http://localhost:8090/api/health
+
+For detailed Docker deployment options, see [README-DOCKER.md](README-DOCKER.md).
+
+### Option 2: Development Installation
+
+#### Prerequisites
 - Python 3.10+
 - OpenAI API key
 - Supabase account (recommended for full functionality)
 
-### Installation
+#### Installation
 
 1. **Clone and navigate:**
    ```bash
-   cd agents/open_horizon_ai
+   git clone https://github.com/odin2-hash/open-horizon-ai.git
+   cd open-horizon-ai
    ```
 
 2. **Set up Supabase Database:**
@@ -92,7 +121,7 @@ An intelligent Erasmus+ project management system for Swedish NGO "Open Horizon"
    docker-compose up --build
    
    # Option 2: Development mode
-   # Terminal 1 - Backend (runs on port 8080)
+   # Terminal 1 - Backend (runs on port 8090)
    python backend/api/main.py
    
    # Terminal 2 - Frontend (runs on port 3030)
@@ -104,12 +133,12 @@ An intelligent Erasmus+ project management system for Swedish NGO "Open Horizon"
 
 7. **Access the application:**
    - **Web Interface**: http://localhost:3030
-   - **API Documentation**: http://localhost:8080/docs
-   - **Health Check**: http://localhost:8080/api/health
+   - **API Documentation**: http://localhost:8090/docs
+   - **Health Check**: http://localhost:8090/api/health
    
    **Note**: Ports have been changed to avoid conflicts with Archon:
    - Open Horizon AI Frontend: **3030** (vs Archon's 3737)
-   - Open Horizon AI Backend: **8080** (vs Archon's 8181)
+   - Open Horizon AI Backend: **8090** (vs Archon's 8080/8181)
 
 ### Environment Variables
 
@@ -175,10 +204,10 @@ response = await run_open_horizon_agent(
 
 ```bash
 # Health check
-GET http://localhost:8080/api/health
+GET http://localhost:8090/api/health
 
 # Brainstorming
-POST http://localhost:8080/api/brainstorm
+POST http://localhost:8090/api/brainstorm
 {
   "initial_concept": "Digital skills for young people",
   "focus_preference": "Digital Transformation",
