@@ -55,8 +55,8 @@ An intelligent Erasmus+ project management system for Swedish NGO "Open Horizon"
 
 2. **Set up Supabase Database:**
    - Create a new project at https://supabase.com
-   - Go to your project's SQL Editor
-   - Run the setup script: Copy and paste the contents of `supabase/complete_setup.sql`
+   - Follow the step-by-step guide in `SUPABASE_SETUP_SIMPLE.md`
+   - Run 5 small SQL scripts in order (much more reliable than one large script)
    - This will create all necessary tables, functions, and policies
 
 3. **Create virtual environment:**
