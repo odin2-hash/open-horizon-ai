@@ -24,20 +24,26 @@ An intelligent Erasmus+ project management system for Swedish NGO "Open Horizon"
 
 ## 🏗️ Architecture
 
+**Complete Web-Based System** (Forked from Archon Architecture):
+
 ```
-[CLI Interface] ↔ [FastAPI Backend] ↔ [Specialized Pydantic AI Agents]
+[React Frontend] ↔ [FastAPI Backend] ↔ [Specialized Pydantic AI Agents]
       ↓                    ↓                       ↓
-[Rich Console UI]    [REST Endpoints]    [OpenAI GPT-4o-mini]
+[Modern Web UI]     [REST Endpoints]    [OpenAI GPT-4o-mini]
       ↓                    ↓                       ↓
-[User Interaction]   [Supabase Database]   [Partner Discovery Tools]
+[User Dashboard]   [Supabase Database]   [Erasmus+ Knowledge Base]
+      ↓                    ↓                       ↓
+[Real-time Updates] [Web Crawling Service] [Partner Discovery Tools]
 ```
 
 ### Tech Stack
-- **AI Framework**: Pydantic AI with OpenAI GPT-4o-mini
+- **Frontend**: React 18 + TypeScript + Tailwind CSS (forked from Archon UI)
 - **Backend**: FastAPI with async/await patterns
-- **Database**: Supabase (PostgreSQL + real-time features)
-- **Interface**: Rich CLI + REST API
-- **Security**: JWT authentication and API key management
+- **AI Framework**: Pydantic AI with OpenAI GPT-4o-mini
+- **Database**: Supabase (PostgreSQL + real-time features + RLS)
+- **Knowledge Base**: Web crawling service specialized for Erasmus+ documentation
+- **Deployment**: Docker Compose with multi-service orchestration
+- **Security**: JWT authentication, Row Level Security, and API key management
 
 ## 🚀 Quick Start
 
@@ -80,15 +86,30 @@ An intelligent Erasmus+ project management system for Swedish NGO "Open Horizon"
    # - SUPABASE_SERVICE_KEY: Your Supabase service role key (for full functionality)
    ```
 
-6. **Run the CLI interface:**
+6. **Launch the complete system:**
    ```bash
+   # Option 1: Docker Compose (Recommended)
+   docker-compose up --build
+   
+   # Option 2: Development mode
+   # Terminal 1 - Backend (runs on port 8080)
+   python backend/api/main.py
+   
+   # Terminal 2 - Frontend (runs on port 3030)
+   cd frontend && npm install && PORT=3030 npm run dev
+   
+   # Option 3: Legacy CLI interface
    python cli.py
    ```
 
-7. **Or start the API server:**
-   ```bash
-   python api.py
-   ```
+7. **Access the application:**
+   - **Web Interface**: http://localhost:3030
+   - **API Documentation**: http://localhost:8080/docs
+   - **Health Check**: http://localhost:8080/api/health
+   
+   **Note**: Ports have been changed to avoid conflicts with Archon:
+   - Open Horizon AI Frontend: **3030** (vs Archon's 3737)
+   - Open Horizon AI Backend: **8080** (vs Archon's 8181)
 
 ### Environment Variables
 
@@ -154,10 +175,10 @@ response = await run_open_horizon_agent(
 
 ```bash
 # Health check
-GET /health
+GET http://localhost:8080/api/health
 
 # Brainstorming
-POST /api/brainstorm
+POST http://localhost:8080/api/brainstorm
 {
   "initial_concept": "Digital skills for young people",
   "focus_preference": "Digital Transformation",

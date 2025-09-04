@@ -1,10 +1,34 @@
 version: '3.8'
 
 services:
-  open-horizon-ai:
-    build: .
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "3030:3030"  # Changed from 3000 to avoid conflicts
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080
+      - REACT_APP_SUPABASE_URL=${SUPABASE_URL:-https://demo.supabase.co}
+      - REACT_APP_SUPABASE_KEY=${SUPABASE_KEY:-demo-key}
+      - PORT=3030
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    networks:
+      - open-horizon-network
+    depends_on:
+      - backend
+
+  # FastAPI Backend  
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8080:8080"  # Changed from 8000 to avoid conflicts
     environment:
       - LLM_PROVIDER=openai
       - LLM_API_KEY=${LLM_API_KEY}
@@ -24,7 +48,7 @@ services:
       - TIMEOUT_SECONDS=30
       - DATABASE_POOL_SIZE=10
       - DATABASE_MAX_CONNECTIONS=20
-      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:8080
+      - ALLOWED_ORIGINS=http://localhost:3030,http://localhost:5173,http://localhost:8080
       - CORS_ALLOW_CREDENTIALS=true
     env_file:
       - .env
@@ -32,7 +56,7 @@ services:
     volumes:
       - ./logs:/app/logs
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
