@@ -44,7 +44,7 @@ An intelligent Erasmus+ project management system for Swedish NGO "Open Horizon"
 ### Prerequisites
 - Python 3.10+
 - OpenAI API key
-- Supabase account (optional for persistence)
+- Supabase account (recommended for full functionality)
 
 ### Installation
 
@@ -53,29 +53,39 @@ An intelligent Erasmus+ project management system for Swedish NGO "Open Horizon"
    cd agents/open_horizon_ai
    ```
 
-2. **Create virtual environment:**
+2. **Set up Supabase Database:**
+   - Create a new project at https://supabase.com
+   - Go to your project's SQL Editor
+   - Run the setup script: Copy and paste the contents of `supabase/complete_setup.sql`
+   - This will create all necessary tables, functions, and policies
+
+3. **Create virtual environment:**
    ```bash
    python -m venv venv
    source venv/bin/activate  # or `venv\Scripts\activate` on Windows
    ```
 
-3. **Install dependencies:**
+4. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Configure environment:**
+5. **Configure environment:**
    ```bash
    cp .env.example .env
-   # Edit .env with your API keys
+   # Edit .env with your API keys:
+   # - LLM_API_KEY: Your OpenAI API key
+   # - SUPABASE_URL: Your Supabase project URL
+   # - SUPABASE_KEY: Your Supabase anon key
+   # - SUPABASE_SERVICE_KEY: Your Supabase service role key (for full functionality)
    ```
 
-5. **Run the CLI interface:**
+6. **Run the CLI interface:**
    ```bash
    python cli.py
    ```
 
-6. **Or start the API server:**
+7. **Or start the API server:**
    ```bash
    python api.py
    ```
@@ -87,12 +97,18 @@ An intelligent Erasmus+ project management system for Swedish NGO "Open Horizon"
 LLM_API_KEY=sk-your-openai-api-key-here
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_KEY=your-supabase-service-role-key
 
 # Optional
 ERASMUS_PARTNER_DB_API_KEY=your-partner-api-key
 SECRET_KEY=your-jwt-secret
 DEBUG=false
 ```
+
+**Important Notes:**
+- For cloud Supabase, use the "legacy" (longer) service role key
+- The service role key is required for full database functionality including RLS policies
+- Without Supabase, the system will work with mock data for development
 
 ## 💻 Usage Examples
 
